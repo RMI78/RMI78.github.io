@@ -1,0 +1,21 @@
+---
+layout: page
+---
+
+<p>On this page you can find all my GitHub projects/repositories that I have created...</p>
+{% for repository in site.github.public_repositories %} 
+  {% if repository.fork == false %} 
+    <a href="{{ repository.html_url }}">{{repository.name}}</a>
+    </br> 
+  {% endif %} 
+{% endfor%}
+
+  </br>
+
+<p>... And the ones I took part in, as an open-source developper</p>
+{% for repository in site.github.public_repositories %}
+  {% if repository.fork %}
+    <a href="{{ repository.html_url }}">{{repository.name}}</a>
+    </br>
+    {% endif %} 
+{% endfor %}

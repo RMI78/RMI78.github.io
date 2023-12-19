@@ -45,10 +45,14 @@ jobs:
           ruby-version: 3
           bundler-cache: true
 
+      - name: Install plugins
+        run: gem install "jekyll-github-metadata"
+
       - name: Build site
         run: bundle exec jekyll b -d "_site${{ steps.pages.outputs.base_path }}"
         env:
           JEKYLL_ENV: "production"
+          PAGES_REPO_NWO: "RMI78/RMI78.github.io"
 
       - name: Test site
         run: |
