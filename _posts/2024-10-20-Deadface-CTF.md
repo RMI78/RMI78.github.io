@@ -15,6 +15,7 @@ I also completed the Trendytrove track which apparently wasn't that easy to full
 ## Flag 1: Landing zone
 
 So the first step consisted of connecting to the remote machine with the provided credentials on the website:
+
 ```
 ro@Parrot:~/$ ssh deephax@deephax.deadface.io
 ```
@@ -53,6 +54,7 @@ Running this command also tells us a lot about the system and is something that 
 ## Flag 2: Short-Term
 
 This flag requires to search a little bit across the system everywhere you can. Sometimes it is a hidden file (starting with a dot), it could also be explicit (named `flag`) or implicit. some interesting directories are the home of the users (your own but could also be the others if you are lucky enough to have the permissions), the directories `/var`, `/tmp`, `/usr`, etc. I found the flag my listing the `/tmp` directory (short-term says the flag, just like my memory). Also when entering in such challenges, do not hesitate to setup your own aliases such as I did, it saves you time and it's a set it and forget it thing.
+
 
 ```
 ~ $ alias "ls"="ls -la"
@@ -105,6 +107,7 @@ The message coming with the flag title was:
 
 So we had to figure out what this machine was doing, staring by using ``ps``.
 
+
 ``` 
 ~ $ ps -a 
 PID   USER     TIME  COMMAND
@@ -116,6 +119,7 @@ PID   USER     TIME  COMMAND
 ~ $
 ```
 Some stuff are weird here. the root user is running a cronjob, along with something called ``usrv`` and a script called `start.sh`. But there is nothing really explicit about what the server is doing. Before investigating on the cronjob I tried to see which port were open on the machine using ``netstat`` as a last try to see if we could figure out something else and it looks like it paid off.
+
 
 ```
 netstat: can't scan /proc - are you root?
@@ -158,6 +162,7 @@ Remember this cronjob wizardry ? Let's investigate this with in mind the fact th
 ~ $
 ```
 So something is going on with a program called sendit called every time and the standard error is sent to the logs. Let's see what it this. 
+
 ```
 ~ $ /opt/sendit/sendit
 Error, no such host: c2.deadface.io
@@ -194,6 +199,7 @@ Usage: readlog [-f FILE] [-v]
 ```
 
 (Yeah it wasn't in the associated opt directory but I just assumed it was somewhere in the machine.)
+
 
 ```
 ~ $ ls /usr/bin/readlog 
@@ -298,6 +304,7 @@ Because it is on the username you log with a user ID of 1 which is the admin whi
 ## Flag 2: Yalonda
 
 Here we need to find Yalonda's birthday date, mean there should be a way to expose customer's data, so I messed around with the application, explored the profile page but nothing. Instead of fuzzing the website, I just, by pure coincidence, tried to see if there was an admin page by entering the following url:
+
 ```
 https://trendytrove.deadface.io/admin.php
 ```
