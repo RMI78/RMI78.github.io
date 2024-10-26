@@ -3,11 +3,11 @@ layout: page
 ---
 
 <p>On this page you can find all my GitHub projects/repositories that I have created...</p>
-{% for repository in site.github.public_repositories %} 
-  {% if repository.fork == false %} 
+{% for repository in site.github.public_repositories %}
+  {% if repository.fork == false %}
     <a href="{{ repository.html_url }}">{{repository.name}}</a>
-    </br> 
-  {% endif %} 
+    </br>
+  {% endif %}
 {% endfor%}
 
   </br>
@@ -17,5 +17,9 @@ layout: page
   {% if repository.fork %}
     <a href="{{ repository.html_url }}">{{repository.name}}</a>
     </br>
-    {% endif %} 
+    {% endif %}
 {% endfor %}
+
+</br>
+
+<p>Also here is my <a href="https://api.badgr.io/public/collections/2df0bafbbc3f42b6b239e4ff9c28d2bb">Canvas Badgr collection</a> where I expose all the badges I won over the few capture the flag that I did.</p>
