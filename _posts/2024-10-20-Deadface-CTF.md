@@ -53,7 +53,7 @@ Running this command also tells us a lot about the system and is something that 
 
 ## Flag 2: Short-Term
 
-This flag requires to search a little bit across the system everywhere you can. Sometimes it is a hidden file (starting with a dot), it could also be explicit (named `flag`) or implicit. some interesting directories are the home of the users (your own but could also be the others if you are lucky enough to have the permissions), the directories `/var`, `/tmp`, `/usr`, etc. I found the flag my listing the `/tmp` directory (short-term says the flag, just like my memory). Also when entering in such challenges, do not hesitate to setup your own aliases such as I did, it saves you time and it's a set it and forget it thing.
+This flag requires to search a little bit across the system everywhere you can. Sometimes it is a hidden file (starting with a dot), it could also be explicit (named `flag`) or implicit. Some interesting directories are the home of the users (your own but could also be the others if you are lucky enough to have the permissions), the directories `/var`, `/tmp`, `/usr`, etc. I found the flag my listing the `/tmp` directory (short-term says the flag, just like my memory). Also when entering in such challenges, do not hesitate to setup your own aliases such as I did, it saves you time and it's a set it and forget it thing.
 
 
 ```
@@ -118,7 +118,7 @@ PID   USER     TIME  COMMAND
    82 deephax   0:00 ps -a
 ~ $
 ```
-Some stuff are weird here. the root user is running a cronjob, along with something called ``usrv`` and a script called `start.sh`. But there is nothing really explicit about what the server is doing. Before investigating on the cronjob I tried to see which port were open on the machine using ``netstat`` as a last try to see if we could figure out something else and it looks like it paid off.
+Some stuff are weird here. The root user is running a cronjob, along with something called ``usrv`` and a script called `start.sh`. But there is nothing really explicit about what the server is doing. Before investigating on the cronjob I tried to see which port were open on the machine using ``netstat`` as a last try to see if we could figure out something else and it looks like it paid off.
 
 
 ```
@@ -228,7 +228,7 @@ The binary has not for purpose to run on your machine, the goal is here to input
 You can see over the different tools and with the above image that there is a command called "execute_command_as_lilith" which smells really good, and in the main function, you can see by the getops function that you also have an hidden option "c" which could stand for "command" so let's try opening a bash with that.
 
 ```
-~ $ readlog -c sh
+~ $ /usr/bin/readlog -c sh
 Executing command as lilith: sh
 ~ $ whoami
 lilith
@@ -262,6 +262,15 @@ Remove (unlink) FILEs
 	-R,-r	Recurse
 /home/deephax # whoami
 root
+/home/deephax #
+```
+
+Then the challenge statement says: "There is a flag that belongs to the root user.". Seems straightforward to me:
+```
+home/deephax # ls /root/
+flag6.txt
+/home/deephax # cat /root/flag6.txt 
+flag{hostbusters6_41a4e1304f74df0c}
 /home/deephax #
 ```
 
@@ -373,7 +382,7 @@ flag{C0MM4ND_1NJ3CT10N_3XP0S3D_D4T4}
 ```
 
 ## Oopsie
-During the CTF, this Docker container received some injections such as I did, there was a couple of WebShells including mine but at some point I have seen only 2 webshells remaining, mine and a ``_r_.php`` then suddenly only my webshell got wiped of the system, not the other one. So if you had this shell and you removed mine just know that I read your password-protected shell code, then I reused the RCE to erase your SHA/MD5 password-hashed by mine, thus, stealing your shell (which was really good by the way). If you removed mine I think it's fair, if not... oopsie.
+During the CTF, this Docker container received some injections such as I did, there was a couple of WebShells including mine but at some point I have seen only 2 webshells remaining, mine and a ``_r_.php`` then suddenly only my webshell got wiped of the system, not the other one. So if you had this shell and you removed mine just know that I read your password-protected shell code, then I reused the RCE to erase your SHA/MD5 password-hashed by mine, thus, stealing your shell (which was really good by the way). If you removed mine I think it's fair, if not... Oopsie.
 
 
 # Conclusion
@@ -405,4 +414,11 @@ On [neatzsche's GitHub repo](https://github.com/neatzsche/2024deadface), you can
 - Killer Curves - Cryptography
 - Dead Browse 1 - dead_browse
 - ShellDrizzle - dead_browse
+
+And finally you can find all writeups for challenges made by syyntax [here](https://cyberhacktics.com/) which includes:
+- Offsite Target - Steganography
+- Something in the Dark - Steganography
+- Descended from Wolves - Steganography
+- Electric Soldiers - Steganography 
+- Tri Harder - Steganography
 
