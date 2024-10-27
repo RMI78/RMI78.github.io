@@ -406,3 +406,10 @@ On [neatzsche's GitHub repo](https://github.com/neatzsche/2024deadface), you can
 - Dead Browse 1 - dead_browse
 - ShellDrizzle - dead_browse
 
+And finally you can find all writeups for challenges made by syyntax [here](https://cyberhacktics.com/) which includes:
+- Offsite Target - Steganography
+- Something in the Dark - Steganography
+- Descended from Wolves - Steganography
+- Electric Soldiers - Steganography 
+- Tri Harder - Steganography
+
